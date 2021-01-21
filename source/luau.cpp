@@ -37,7 +37,6 @@ void registerVecUserType(const std::string &name, sol::state &lua)
     v4["a"] = &vec4Type::w;
 }
 
-
 sol::state &luau::getLuaState()
 {
     static sol::state *lua = NULL;
@@ -126,7 +125,8 @@ sol::state &luau::getLuaState()
         registerVecUserType<float>("vec", *lua);
 
         // register glm quat:
-        sol::usertype<quat> qut = lua->new_usertype<quat>("quat");
+        sol::usertype<quat> qut = lua->new_usertype<quat>("quat", sol::call_constructor,
+              sol::constructors<quat()>());
 
         for (int axis = 0; axis < 3; axis++)
             qut[axis == 0 ? "x" : (axis == 1 ? "y" : "z")] = sol::property([axis](quat &q) {
@@ -141,6 +141,15 @@ sol::state &luau::getLuaState()
         qut["getAxis"] = [] (quat &q) -> vec3 { return axis(q); };
         qut["setFromAngleAndAxis"] = [] (quat &q, float angle, vec3 axis) {
             q = angleAxis(angle * mu::DEGREES_TO_RAD, axis);
+        };
+
+
+
+        // register entt::entity:
+        sol::usertype<entt::entity> eType = lua->new_usertype<entt::entity>("entity");
+
+        env["entityID"] = [] (const sol::optional<int> &optionalID) -> entt::entity {
+            return optionalID.has_value() ? entt::entity(optionalID.value()) : entt::null;
         };
     }
     return *lua;

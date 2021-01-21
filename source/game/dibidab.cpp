@@ -9,6 +9,7 @@
 #include "../ecs/EntityInspector.h"
 #include "../rendering/ImGuiStyle.h"
 #include "dibidab.h"
+#include "../lua_asset.h"
 
 dibidab::EngineSettings dibidab::settings;
 
@@ -111,31 +112,31 @@ void showDeveloperOptionsMenuBar()
 
 void addStandardAssetLoaders()
 {
-    AssetManager::addAssetLoader<Texture>(".png|.jpg|.jpeg|.tga|.bmp|.psd|.gif|.hdr", [&](auto path) {
+    addLuaAssetLoader<Texture>("texture_asset", ".png|.jpg|.jpeg|.tga|.bmp|.psd|.gif|.hdr", [&](auto path) {
 
         return new Texture(Texture::fromImageFile(path.c_str()));
     });
-    AssetManager::addAssetLoader<std::string>(".frag|.vert", [](auto path) {
+    addLuaAssetLoader<std::string>("shader_asset", ".frag|.vert", [](auto path) {
 
         return new std::string(File::readString(path.c_str()));
     });
-    AssetManager::addAssetLoader<json>(".json", [](auto path) {
+    addLuaAssetLoader<json>("json_asset", ".json", [](auto path) {
 
         return new json(json::parse(File::readString(path.c_str())));
     });
-    AssetManager::addAssetLoader<au::Sound>(".wav", [](auto path) {
+    addLuaAssetLoader<au::Sound>("sound_asset", ".wav", [](auto path) {
 
         auto sound = new au::Sound;
         au::WavLoader(path.c_str(), *sound);
         return sound;
     });
-    AssetManager::addAssetLoader<au::Sound>(".ogg", [](auto path) {
+    addLuaAssetLoader<au::Sound>("sound_asset", ".ogg", [](auto path) {
 
         auto sound = new au::Sound;
         au::OggLoader::load(path.c_str(), *sound);
         return sound;
     });
-    AssetManager::addAssetLoader<luau::Script>(".lua", [](auto path) {
+    addLuaAssetLoader<luau::Script>("script_asset", ".lua", [](auto path) {
 
         return new luau::Script(path);
     });

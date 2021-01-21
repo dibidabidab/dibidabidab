@@ -68,19 +68,3 @@ void jsonFromLuaTable(const sol::table &table, json &jsonOut)
             jsonOut.push_back(jsonVal);
     }
 }
-
-int sol_lua_push(sol::types<entt::entity>, lua_State *L, const entt::entity &e)
-{
-    int n;
-    if (e != entt::null)
-        n = sol::stack::push(L, int(e));
-    else
-        n = sol::stack::push(L, sol::nil);
-    return n;
-}
-
-entt::entity sol_lua_get(sol::types<entt::entity>, lua_State *L, int index, sol::stack::record &tracking)
-{
-    sol::optional<int> eint = sol::stack::get<sol::optional<int>>(L, index, tracking);
-    return eint.has_value() ? entt::entity(eint.value()) : entt::null;
-}
